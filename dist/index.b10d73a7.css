@@ -1,0 +1,49 @@
+body {
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.todo {
+  width: 50%;
+  padding: 0;
+  list-style: none;
+}
+
+.todo__text {
+  width: 100%;
+  text-align: center;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin: 20px 0;
+  padding: 5px 0;
+  transition: transform .3s;
+}
+
+.todo__text:hover {
+  cursor: pointer;
+  background-color: #0000004d;
+  transform: scale(1.05);
+}
+
+.todo__text--done {
+  text-decoration: line-through;
+}
+
+form {
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.error {
+  color: red;
+  font-size: 1.1em;
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+/*# sourceMappingURL=index.b10d73a7.css.map */
