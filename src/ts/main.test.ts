@@ -16,13 +16,14 @@ import { createNewTodo } from "./main";
 // förväntad funktion: kollar om det är fler än 3 bokstäver, antingen pushar in i listan
 // eller visar error
 
-test("should push in to list or throw error", () => {
+test("should throw error if <3 letters", () => {
 // Arrange
 let todoText = 'Köpa mjölk';
 let isDone = false;
-let todos: Todo[] = [new Todo("Promenera hunden", true)];
+//let todos: Todo[] = [new Todo("Promenera hunden", true)];
 
 // Act
+let isLongEnough = createNewTodo(todoText, false)
 
 // Assert
 
