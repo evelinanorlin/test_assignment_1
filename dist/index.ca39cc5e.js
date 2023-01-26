@@ -142,7 +142,7 @@
       this[globalName] = mainExports;
     }
   }
-})({"goQ56":[function(require,module,exports) {
+})({"k9g8K":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
@@ -158,7 +158,7 @@ import type {
 interface ParcelRequire {
   (string): mixed;
   cache: {|[string]: ParcelModule|};
-  hotData: mixed;
+  hotData: {|[string]: mixed|};
   Module: any;
   parent: ?ParcelRequire;
   isParcelRequire: true;
@@ -200,7 +200,7 @@ var OldModule = module.bundle.Module;
 function Module(moduleName) {
     OldModule.call(this, moduleName);
     this.hot = {
-        data: module.bundle.hotData,
+        data: module.bundle.hotData[moduleName],
         _acceptCallbacks: [],
         _disposeCallbacks: [],
         accept: function(fn) {
@@ -210,10 +210,11 @@ function Module(moduleName) {
             this._disposeCallbacks.push(fn);
         }
     };
-    module.bundle.hotData = undefined;
+    module.bundle.hotData[moduleName] = undefined;
 }
 module.bundle.Module = Module;
-var checkedAssets, acceptedAssets, assetsToAccept /*: Array<[ParcelRequire, string]> */ ;
+module.bundle.hotData = {};
+var checkedAssets, assetsToDispose, assetsToAccept /*: Array<[ParcelRequire, string]> */ ;
 function getHostname() {
     return HMR_HOST || (location.protocol.indexOf("http") === 0 ? location.hostname : "localhost");
 }
@@ -236,8 +237,8 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
     } // $FlowFixMe
     ws.onmessage = async function(event) {
         checkedAssets = {} /*: {|[string]: boolean|} */ ;
-        acceptedAssets = {} /*: {|[string]: boolean|} */ ;
         assetsToAccept = [];
+        assetsToDispose = [];
         var data = JSON.parse(event.data);
         if (data.type === "update") {
             // Remove error overlay if there is one
@@ -249,10 +250,22 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
             if (handled) {
                 console.clear(); // Dispatch custom event so other runtimes (e.g React Refresh) are aware.
                 if (typeof window !== "undefined" && typeof CustomEvent !== "undefined") window.dispatchEvent(new CustomEvent("parcelhmraccept"));
-                await hmrApplyUpdates(assets);
-                for(var i = 0; i < assetsToAccept.length; i++){
-                    var id = assetsToAccept[i][1];
-                    if (!acceptedAssets[id]) hmrAcceptRun(assetsToAccept[i][0], id);
+                await hmrApplyUpdates(assets); // Dispose all old assets.
+                let processedAssets = {} /*: {|[string]: boolean|} */ ;
+                for(let i = 0; i < assetsToDispose.length; i++){
+                    let id = assetsToDispose[i][1];
+                    if (!processedAssets[id]) {
+                        hmrDispose(assetsToDispose[i][0], id);
+                        processedAssets[id] = true;
+                    }
+                } // Run accept callbacks. This will also re-execute other disposed assets in topological order.
+                processedAssets = {};
+                for(let i = 0; i < assetsToAccept.length; i++){
+                    let id = assetsToAccept[i][1];
+                    if (!processedAssets[id]) {
+                        hmrAccept(assetsToAccept[i][0], id);
+                        processedAssets[id] = true;
+                    }
                 }
             } else fullReload();
         }
@@ -505,46 +518,63 @@ function hmrAcceptCheckOne(bundle, id, depsByBundle) {
     if (checkedAssets[id]) return true;
     checkedAssets[id] = true;
     var cached = bundle.cache[id];
-    assetsToAccept.push([
+    assetsToDispose.push([
         bundle,
         id
     ]);
-    if (!cached || cached.hot && cached.hot._acceptCallbacks.length) return true;
+    if (!cached || cached.hot && cached.hot._acceptCallbacks.length) {
+        assetsToAccept.push([
+            bundle,
+            id
+        ]);
+        return true;
+    }
 }
-function hmrAcceptRun(bundle, id) {
+function hmrDispose(bundle, id) {
     var cached = bundle.cache[id];
-    bundle.hotData = {};
-    if (cached && cached.hot) cached.hot.data = bundle.hotData;
+    bundle.hotData[id] = {};
+    if (cached && cached.hot) cached.hot.data = bundle.hotData[id];
     if (cached && cached.hot && cached.hot._disposeCallbacks.length) cached.hot._disposeCallbacks.forEach(function(cb) {
-        cb(bundle.hotData);
+        cb(bundle.hotData[id]);
     });
     delete bundle.cache[id];
-    bundle(id);
-    cached = bundle.cache[id];
+}
+function hmrAccept(bundle, id) {
+    // Execute the module.
+    bundle(id); // Run the accept callbacks in the new version of the module.
+    var cached = bundle.cache[id];
     if (cached && cached.hot && cached.hot._acceptCallbacks.length) cached.hot._acceptCallbacks.forEach(function(cb) {
         var assetsToAlsoAccept = cb(function() {
             return getParents(module.bundle.root, id);
         });
-        if (assetsToAlsoAccept && assetsToAccept.length) // $FlowFixMe[method-unbinding]
-        assetsToAccept.push.apply(assetsToAccept, assetsToAlsoAccept);
+        if (assetsToAlsoAccept && assetsToAccept.length) {
+            assetsToAlsoAccept.forEach(function(a) {
+                hmrDispose(a[0], a[1]);
+            }); // $FlowFixMe[method-unbinding]
+            assetsToAccept.push.apply(assetsToAccept, assetsToAlsoAccept);
+        }
     });
-    acceptedAssets[id] = true;
 }
 
 },{}],"4j3ZX":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-// pushar in todon i listan och kör createHtml() om allt stämmer. Måste vara
-// 3 bokstäver minst
 parcelHelpers.export(exports, "createNewTodo", ()=>createNewTodo);
+parcelHelpers.export(exports, "createHtml", ()=>createHtml);
+// Gör texten överstyken
+parcelHelpers.export(exports, "toggleTodo", ()=>toggleTodo);
+// skapar sträng under input om det är för få bokstäver, genom att lägga till eller ta bort klassen show.
+// "error-texten" genereras i addTodo()
+parcelHelpers.export(exports, "displayError", ()=>displayError);
+//tar bort alla todos och genererar ny HTML 
+parcelHelpers.export(exports, "clearTodos", ()=>clearTodos) //antar att denna könner vad so ligger lagrat när sidan laddas in
+ // createHtml(todos);
+;
 var _functions = require("./functions");
-// skapar lista med items som stoppas in i listan i appen
 let todos = JSON.parse(localStorage.getItem("todos") || "[]");
-// tar bort alla todos när man trycker på "rensa lista"
 document.getElementById("clearTodos")?.addEventListener("click", ()=>{
     clearTodos(todos);
 });
-// tar texten i input och kör igång createNewTodo när en trycker på "skapa"-knappen
 document.getElementById("newTodoForm")?.addEventListener("submit", (e)=>{
     e.preventDefault();
     let todoText = document.getElementById("newTodoText").value;
@@ -553,10 +583,9 @@ document.getElementById("newTodoForm")?.addEventListener("submit", (e)=>{
 });
 function createNewTodo(todoText, todos) {
     let result = (0, _functions.addTodo)(todoText, todos);
-    if (result.success) createHtml(todos);
-    else displayError(result.error, true);
+    if (result.success) exports.createHtml(todos);
+    else exports.displayError(result.error, true);
 }
-// Skapar UL med alla todosen i listan.
 function createHtml(todos) {
     localStorage.setItem("todos", JSON.stringify(todos));
     let todosContainer = document.getElementById("todos");
@@ -567,31 +596,25 @@ function createHtml(todos) {
         li.classList.add("todo__text");
         li.innerHTML = todos[i].text;
         li.addEventListener("click", ()=>{
-            toggleTodo(todos[i]);
+            exports.toggleTodo(todos[i]);
         });
         todosContainer.appendChild(li);
     }
 }
-// Gör texten överstyken
 function toggleTodo(todo) {
-    (0, _functions.changeTodo)(todo); // boolean, changes to flse or true
-    createHtml(todos); // skapar html av listan, lägger till klassen todo__text--done om den är klickad på
+    (0, _functions.changeTodo)(todo);
+    exports.createHtml(todos);
 }
-// skapar sträng under input om det är för få bokstäver, genom att lägga till eller ta bort klassen show.
-// "error-texten" genereras i addTodo()
 function displayError(error, show) {
     let errorContainer = document.getElementById("error");
     errorContainer.innerHTML = error;
     if (show) errorContainer.classList.add("show");
     else errorContainer.classList.remove("show");
 }
-//tar bort alla todos och genererar ny HTML 
 function clearTodos(todos) {
     (0, _functions.removeAllTodos)(todos);
-    createHtml(todos);
+    exports.createHtml(todos); // använder bara när funktionen ligger i samma modul
 }
-//antar att denna könner vad so ligger lagrat när sidan laddas in
-createHtml(todos);
 
 },{"./functions":"dxSxr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dxSxr":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -661,6 +684,6 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}]},["goQ56","4j3ZX"], "4j3ZX", "parcelRequire94c2")
+},{}]},["k9g8K","4j3ZX"], "4j3ZX", "parcelRequire94c2")
 
 //# sourceMappingURL=index.ca39cc5e.js.map
