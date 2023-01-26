@@ -561,14 +561,9 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "createNewTodo", ()=>createNewTodo);
 parcelHelpers.export(exports, "createHtml", ()=>createHtml);
-// Gör texten överstyken
 parcelHelpers.export(exports, "toggleTodo", ()=>toggleTodo);
-// skapar sträng under input om det är för få bokstäver, genom att lägga till eller ta bort klassen show.
-// "error-texten" genereras i addTodo()
 parcelHelpers.export(exports, "displayError", ()=>displayError);
-//tar bort alla todos och genererar ny HTML 
-parcelHelpers.export(exports, "clearTodos", ()=>clearTodos) //antar att denna könner vad so ligger lagrat när sidan laddas in
- // createHtml(todos);
+parcelHelpers.export(exports, "clearTodos", ()=>clearTodos) // createHtml(todos);
 ;
 var _functions = require("./functions");
 let todos = JSON.parse(localStorage.getItem("todos") || "[]");
@@ -613,7 +608,7 @@ function displayError(error, show) {
 }
 function clearTodos(todos) {
     (0, _functions.removeAllTodos)(todos);
-    exports.createHtml(todos); // använder bara när funktionen ligger i samma modul
+    exports.createHtml(todos);
 }
 
 },{"./functions":"dxSxr","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dxSxr":[function(require,module,exports) {

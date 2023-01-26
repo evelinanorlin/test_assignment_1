@@ -59,14 +59,11 @@ export function createHtml(todos: Todo[]) {
   }
 }
 
-// Gör texten överstyken
 export function toggleTodo(todo: Todo) {
   changeTodo(todo);
   exports.createHtml(todos);
 }
 
-// skapar sträng under input om det är för få bokstäver, genom att lägga till eller ta bort klassen show.
-// "error-texten" genereras i addTodo()
 export function displayError(error: string, show: boolean) {
   let errorContainer: HTMLDivElement = document.getElementById(
     "error"
@@ -81,12 +78,9 @@ export function displayError(error: string, show: boolean) {
   }
 }
 
-
-//tar bort alla todos och genererar ny HTML 
 export function clearTodos(todos: Todo[]) {
   removeAllTodos(todos);
-  exports.createHtml(todos); // använder bara när funktionen ligger i samma modul
+  exports.createHtml(todos);
 }
 
-//antar att denna könner vad so ligger lagrat när sidan laddas in
 // createHtml(todos);
