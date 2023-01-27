@@ -559,17 +559,23 @@ function hmrAccept(bundle, id) {
 },{}],"4j3ZX":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "sortButtonClicked", ()=>sortButtonClicked);
 parcelHelpers.export(exports, "createNewTodo", ()=>createNewTodo);
 parcelHelpers.export(exports, "createHtml", ()=>createHtml);
 parcelHelpers.export(exports, "toggleTodo", ()=>toggleTodo);
 parcelHelpers.export(exports, "displayError", ()=>displayError);
-parcelHelpers.export(exports, "clearTodos", ()=>clearTodos) // createHtml(todos);
+parcelHelpers.export(exports, "clearTodos", ()=>clearTodos) //createHtml(todos);
 ;
 var _functions = require("./functions");
 let todos = JSON.parse(localStorage.getItem("todos") || "[]");
 document.getElementById("clearTodos")?.addEventListener("click", ()=>{
     clearTodos(todos);
 });
+function sortButtonClicked() {
+    document.getElementById("sort")?.addEventListener("click", ()=>{
+        (0, _functions.sortList)(todos);
+    });
+}
 document.getElementById("newTodoForm")?.addEventListener("submit", (e)=>{
     e.preventDefault();
     let todoText = document.getElementById("newTodoText").value;
@@ -617,7 +623,9 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "addTodo", ()=>addTodo);
 parcelHelpers.export(exports, "changeTodo", ()=>changeTodo);
 parcelHelpers.export(exports, "removeAllTodos", ()=>removeAllTodos);
+parcelHelpers.export(exports, "sortList", ()=>sortList);
 var _todo = require("./models/Todo");
+var _main = require("./main");
 function addTodo(todoText, todos) {
     if (todoText.length > 2) {
         let newTodo = new (0, _todo.Todo)(todoText, false);
@@ -637,8 +645,12 @@ function changeTodo(todo) {
 function removeAllTodos(todos) {
     todos.splice(0, todos.length);
 }
+function sortList(todos) {
+    todos.sort((a, b)=>a.text > b.text ? 1 : a.text < b.text ? -1 : 0);
+    (0, _main.createHtml)(todos);
+}
 
-},{"./models/Todo":"6LFGW","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6LFGW":[function(require,module,exports) {
+},{"./models/Todo":"6LFGW","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./main":"4j3ZX"}],"6LFGW":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Todo", ()=>Todo);
