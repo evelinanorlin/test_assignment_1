@@ -23,7 +23,6 @@ document.getElementById("sort")?.addEventListener("click", () => {
     let todoText: string = (
       document.getElementById("newTodoText") as HTMLInputElement
     ).value;
-    console.log("Todos when creating", todos);
 
     createNewTodo(todoText, todos);
   }

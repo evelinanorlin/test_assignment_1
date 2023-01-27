@@ -86,7 +86,6 @@ describe("createNewTodo", () => {
     main.createNewTodo(text, todo);  
 
     // Assert
-    expect(spyOndisplayError).toHaveBeenCalled();
     expect(spyOndisplayError).toBeCalledTimes(1);
 
     spyOndisplayError.mockRestore();
