@@ -94,7 +94,7 @@ describe("createNewTodo", () => {
 })
 
 describe("createHtml", () => {
-    test("should sent list to localStorage", () => {
+    test("should send list to localStorage", () => {
       // Arrange
       document.body.innerHTML = `
       <ul id="todos" class="todo"></ul>
@@ -111,6 +111,8 @@ describe("createHtml", () => {
      let todos = JSON.parse(localStorage.getItem("todos") || "[]");
 
      expect(todos.length).toBe(1);
+     expect(todos[0].text).toBe("hello");
+     expect(todos[0].done).toBeFalsy();
     })
 
     test("should add class todo__text--done if true", () => {
@@ -207,10 +209,8 @@ describe("createHtml", () => {
       let spyOnToggleTodo = jest.spyOn(main, "toggleTodo").mockReturnValue();
       
       // Act
-      main.createHtml(todo)
-    
-      //let container = document.getElementById("todos");
-    
+      main.createHtml(todo);
+
       let todoClicked: HTMLElement = (document.getElementById("todos")?.firstElementChild as HTMLElement)
       todoClicked.click();
     
